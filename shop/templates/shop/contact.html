@@ -1,0 +1,61 @@
+<!-- all the  basic content  is copied from the basic.html-->
+
+{% extends 'shop/basic.html' %}
+
+{% block title%}  Title of About {% endblock %}
+
+
+{% block body%} 
+<div class="container-fluid  mt-3">
+  <div class="jumbotron pt-4">
+      <h1 class="display-4 text-success ">Contact</h1>
+      <p class="lead">Interested in working together ? I would love to have a conversation with you. Please provide your details.</p>
+      <hr class="my-4">
+      <div class="Container-fluid ">
+          <form action="/shop/" method="POST">
+            {% csrf_token %}
+              <div class="form-group">
+                <label for="exampleFormControlInput1">Your Name</label>
+                <input type="text" class="form-control" id="exampleFormControlInput1" name="name" placeholder="">
+                <label for="exampleFormControlInput2">Your Email address</label>
+                <input type="email" class="form-control" name="email" id="exampleFormControlInput2" placeholder="name@example.com">
+              </div>
+              <div class="form-group">
+                <label for="exampleFormControlSelect1">Purpose of Contacting</label>
+                <select class="form-control" id="exampleFormControlSelect1"name="purpose">
+                  <option>Work related discussion</option>
+                  <option>Want to know about my Projects</option>
+                  <option>Personal</option>
+                  <option>Feedback</option>
+                  <option>Others (Please Specify)</option>
+                  
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="exampleFormControlTextarea1">Example textarea</label>
+                <textarea type="textarea" class="form-control" id="exampleFormControlTextarea1" rows="2" name= "desc" placeholder="Tell us Something about it (Optional)"></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-md" id="contact_complete" >Submit</button>
+            </form>
+      </div>
+    </div>
+  </div>
+  
+
+
+
+{% endblock %}
+
+{% block js %}
+<script>
+  
+  $('#contact_complete').click(function(){
+    alert("Thank you for contacting Us, we will get to you very soon !")
+    console.log('Contact done');
+    document.location = '/shop';
+  })
+</script>
+
+{% endblock %}

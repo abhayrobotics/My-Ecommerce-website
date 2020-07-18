@@ -1,0 +1,37 @@
+
+body{
+  background-color:indianred;
+}
+.card-body{
+  padding:0.25rem;
+}
+
+.a_flex{
+    display: flex;
+    flex-direction: row;
+    margin:5px;
+    justify-content: center;
+    flex-wrap: wrap;
+    
+  }
+.a_block{
+  display:block;
+  margin: 3px;
+  width: 50px;
+  background-color: rgb(241, 227, 227);
+  text-align: center;
+  
+}
+.a_block p{
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card{
+  width: 16rem;
+  height: 20rem;
+}
+.a_card_img{
+  width:10rem;
+  height:10rem;
+  justify-content: center;
+}

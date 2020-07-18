@@ -1,0 +1,247 @@
+<!-- all the  basic content  is copied from the basic.html-->
+
+{% extends 'shop/basic.html' %}
+
+{% block title%} My Awesome Mart {% endblock %}
+
+{% block css %}
+{% load static %}
+<link rel="stylesheet" href='{% static "shop/a_index_style.css" %}'>
+{% endblock %}
+
+{% block body%}
+{% load static %}
+
+<!-- carousel -->
+<!-- star for loop id- complte carousel ,for my identification-->
+{% for product, range1, nslides in allprods %}
+<!-- slideshow -->
+<div class="row, my-4">
+  <div id="carouselExampleIndicators{{forloop.counter}}" class="carousel slide" data-ride="carousel">
+    <ol class="carousel-indicators">
+      <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+
+      <!-- for loop for verification using a ID-CAR-slide, carousel for adding extra items-->
+      {% for i in range1 %}
+      <li data-target="#carouselExampleIndicators{{forloop.parentloop.counter}}" data-slide-to="{{i}}"></li>
+      {% endfor %}
+      <!--end  for loop  ID-CAR-slide-->
+    </ol>
+    <h2 class=" mx-2">Flash Sale - {{product.0.category}}</h2>
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <div class="container-fluid a_flex mr-3">
+          <div class="card a_block" ">
+          <img src=" /media/{{product.0.image}}" class="card-img-top a_card_img" alt="..." />
+          <div class="card-body">
+            <h6 class="card-title" id = "namepr{{product.0.id}}">{{product.0.product_name}}</h6>
+            <p class="card-text">
+              {{product.0.desc}}
+            </p>
+            <span id='divpr{{product.0.id}}' class="divpr">
+              <button id="pr{{product.0.id}}" class="btn btn-primary text-wrap cart">Add to Cart</button>
+            </span>
+            <a href="/shop/product/{{product.0.id}}"> <button id="pv{{product.0.id}}"
+                class="btn btn-primary text-wrap cart">Quick view</button></a>
+          </div>
+        </div>
+        <!--start for loop  ID-CAR-card-->
+        {% for i in product|slice:"1:" %}
+        <div class="card a_block">
+          <img src="/media/{{i.image}}" class="card-img-top a_card_img" alt="..." />
+          <div class="card-body">
+            <h6 class="card-title" id = "namepr{{i.id}}">{{i.product_name}}</h6>
+            <p class="card-text">
+              {{i.desc}}
+            </p>
+
+            <span id='divpr{{i.id}}' class="divpr">
+              <button id="pr{{i.id}}" class="btn btn-primary text-wrap cart">Add to Cart</button>
+            </span>
+            <a href="/shop/product/{{i.id}}"> <button id="pv{{i.id}}" class="btn btn-primary text-wrap cart">Quick
+                view</button></a>
+          </div>
+        </div>
+
+        {% if forloop.counter|add:1|divisibleby:4 and forloop.counter > 0 and not forloop.last %}
+      </div>
+    </div>
+    <div class="carousel-item">
+      <div class="container-fluid a_flex mr-3">
+        {% endif %}
+        <!--end  for loop  ID-CAR-card-->
+        {% endfor %}
+        <!-- closing container-fluid and carousel-item -->
+      </div>
+    </div>
+    <!-- closing carousel-inner -->
+  </div>
+
+  <a class="carousel-control-prev" href="#carouselExampleIndicators{{forloop.counter}}" role="button" data-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="carousel-control-next" href="#carouselExampleIndicators{{forloop.counter}}" role="button" data-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+</div>
+</div>
+<!-- end for loop id- complete carousel ,-->
+{% endfor %}
+
+{% endblock body %}
+<!-- body ends  -->
+
+{% block js %}
+<script>
+  // FUNCTIONS:
+
+  //  Adding to cart (total quantity) & Adding item to cart ( using as updater)
+  function totquantity(cart) {
+    var tot_items = 0
+    for (item in cart) {
+      tot_items = tot_items + cart[item]
+    }
+    // total quantity
+    document.getElementById("total_cart").innerText = `Quantity(${tot_items})`
+    // Adding item to cart( no. of product)
+    document.getElementById("cart_len").innerText = `(${Object.keys(cart).length})`
+    update_popover(cart);
+  }
+
+  // check for cart items in local storage
+  if (localStorage.getItem('cart') == null) {
+    var cart = {};
+  }
+  else {
+    cart = JSON.parse(localStorage.getItem('cart')) //  string to JS via JSON Parse
+    updatecart(cart);
+    totquantity(cart) ;
+    
+  }
+
+
+  // j query
+
+  // $('.cart').click(function () {
+  $('.divpr').on('click','button.cart',(function () {
+    // console.log('clicked');
+    var idstr = this.id.toString();  // 'this' means that button element, 'id' of that button , convert to string
+    // console.log(idstr)
+
+    // here cart is  {"key": value} key= idstr( id ofthe button), value : no. of times "Add to cart is clicked"
+    if (cart[idstr] != undefined) {
+      cart[idstr] = cart[idstr] + 1;
+      
+    }
+    else {
+      cart[idstr] = 1;
+    }
+    updatecart(cart);
+    totquantity(cart);
+
+    console.log(cart);
+    localStorage.setItem('cart', JSON.stringify(cart)); // JS  to string via JSON.stringify 
+  }))
+
+
+
+  // Popover
+  $('#popcart').popover()
+  // POPOVER function , items in cart
+  update_popover(cart)
+  function update_popover(cart){
+    console.log("popover")
+    popstr = '<h6>All Your products are here !</h6>'
+    let i=1;
+    for (item in cart){
+      popstr= popstr + "<div>"+ i + ". " ;
+      popstr= popstr + document.getElementById('name'+item).innerText + "  |  Qty: "+ cart[item] + "<br>"
+      i= i+1;
+    }
+    // <li class="nav-item">
+    //       <a class="nav-link" id="clear_cart" href="/shop">Clear Cart</a>
+    //     </li>
+    popstr= popstr +`<a href="/shop/checkout" ><button class="btn btn-success mx-1 my-1" >Check Out</button></a>`+`<button class="btn btn-success mx-1 my-1" id="clear_cart" onclick='clearcart()'>Clear Cart</button>`
+    document.getElementById('popcart').setAttribute('data-content',popstr);
+    // to  update , popover has to be changed to ' show'
+    $('#popcart').popover('show')
+  }
+
+
+  // clear cart
+  function clearcart(){
+    cart = JSON.parse(localStorage.getItem('cart'))
+    for (var item in cart){
+      // console.log(item)
+      document.getElementById('div'+item).innerHTML =`<button id=" ` + item + ` " class="btn btn-primary text-wrap cart">Add to Cart</button>`
+    }
+    localStorage.clear();
+    // we need to redefine cart as localStorage.clear() clear datas, even the variable that was  storing data 'cart' so that we can update_popover()
+    cart={}
+    // localStorage.setItem('cart', JSON.stringify(cart));
+    
+    update_popover(cart)
+  
+  }
+
+  //  update cart qunatity
+  function updatecart(cart) {
+
+    // console.log("check123", cart)
+    for (var item in cart) {
+      // console.log(item)
+      document.getElementById('div' + item).innerHTML = `<button class="btn btn-primary  minus "id="minus` + item + `">-</button>  `
+        + `<span id="val` + item + `">`
+        + cart[item]
+        + `</span>`
+        + ` <button class="btn btn-primary plus" id=  "plus` + item + `">+</button>`
+      // my way of +/- items in cart , not working
+      // $('#plus'+item).click(function(){
+      //   console.log("plus"+'.plus'+item + 'val'+item)
+      //   document.getElementById('val'+item).innerHTML = cart[item] +  1
+      //   updatecart(cart)
+
+      // })
+      // $('#minus'+item).click(function(){
+      //   console.log("minus"+'.minus'+item)
+      //   document.getElementById('val'+item),innerHTML = cart[item] -1
+
+      // })
+    }
+    
+  }
+  // adding and removing items by code with
+  $('.divpr').on("click", "button.minus", function () {
+    a = this.id.slice(7,);
+    cart['pr' + a] = cart['pr' + a] - 1;
+    cart['pr' + a] = Math.max(0, cart['pr' + a]);
+    document.getElementById('valpr' + a).innerHTML = cart['pr' + a];
+
+    updatecart(cart);
+    // updating cart to local storage
+    localStorage.setItem('cart', JSON.stringify(cart));
+    // updating total quantity evrytime its changed
+    totquantity(cart)
+  });
+
+
+  $('.divpr').on("click", "button.plus", function () {
+    a = this.id.slice(6,);
+    cart['pr' + a] = cart['pr' + a] + 1;
+    document.getElementById('valpr' + a).innerHTML = cart['pr' + a];
+    updatecart(cart);
+    // updating cart to local storage
+    localStorage.setItem('cart', JSON.stringify(cart));
+    // updating total quantity evrytime its changed
+    totquantity(cart)
+    
+  });
+
+
+
+
+
+</script>
+{% endblock  %}

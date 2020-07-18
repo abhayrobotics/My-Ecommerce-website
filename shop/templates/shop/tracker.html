@@ -1,0 +1,99 @@
+<!-- all the  basic content  is copied from the basic.html-->
+
+{% extends 'shop/basic.html' %}
+
+{% block title%} Title of About {% endblock %}
+
+
+{% block body%}
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="display-4">Track Your Order</h1>
+    <p class="lead">Enter your Order-Id and email-id to track your order.</p>
+    <form method='POST' action="#" id="trackerform">
+      {% csrf_token %}
+
+      <div class="form-row">
+
+
+        <div class="form-group col-md-4">
+          <label for="inputName">Order -Id</label>
+          <input type="text" class="form-control" id="orderid" name='orderid' placeholder="Enter your Order- Id">
+        </div>
+        <div class="form-group col-md-4">
+          <label for="inputName">Enter Your Email</label>
+          <input type="email" class="form-control" id="email" name='email'>
+        </div>
+
+
+        <button type="submit" class="btn btn-primary my-2">Track Order</button>
+
+      </div>
+      <div class="container my-2">
+        <h3> Your Order Status:</h3>
+        <ul class="list-group" id="items">
+          <!-- {{response}}
+          check
+          {{response.0.text}}-->
+          {% for item in response %} 
+          <li class="list-group-item d-flex  my-1 justify-content-between align-items-center">{{item.text}}
+          <span class="badge badge-primary badge-pill py-2 px-4">{{item.time}}</span>
+          </li>
+          {% endfor %}
+          <!-- item will be appende by javascript if present in cart  -->
+        </ul>
+      </div>
+  </div>
+
+
+
+  {% endblock %}
+  {% block js %}
+
+  <script>
+
+    $('#trackerform').submit(function (event) {
+      $('#items').empty()
+      var formdata = {
+        'orderid': $('input[name=orderid]'.val()),
+        'email': $('input[name=email]'.val()),
+        'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]'.val()),
+      };
+      $.ajax({
+        type: 'POST',
+        url: '/shop/tracker/',
+        data: formdata,
+        encode: true
+      })
+
+        .done(function (data) {
+          console.log(data)
+          updates = JSON.parse(data);
+          if (updates.length > 0 & updates != {}) {
+
+            for (i = 0; i < updates.length; i++) {
+              let text = updates[i]['text'];
+              let time = updates[i]['time'];
+              let str = `<li class="list-group-item d-flex  my-1 justify-content-between align-items-center">${i}. ${text}
+              <span class="badge badge-primary badge-pill py-2 px-4">Quantity : ${time}</span>
+              </li>`
+              $('#items').append(str)
+            }
+          }
+          else {
+            let str = `<li class="list-group-item d-flex  my-1 justify-content-between align-items-center">Sorry
+              
+              </li>`
+            $('#items').append(str);
+          }
+        })
+      event.preventDefault();
+    })
+
+    
+
+
+  </script>
+
+
+  {% endblock %}

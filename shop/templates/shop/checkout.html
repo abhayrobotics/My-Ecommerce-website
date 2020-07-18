@@ -1,0 +1,143 @@
+<!-- all the  basic content  is copied from the basic.html-->
+
+{% extends 'shop/basic.html' %}
+
+{% block title%} Check out - My Awesome Cart {% endblock %}
+
+
+{% block body%}
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h2 class="display-4">Check out </h2>
+    <!-- Step 1 review cart items -->
+    <div class="container my-2">
+      <h3> Step 1 : Review your Items</h3>
+      <ul class="list-group" id  ="items">
+        <!-- item will be appende by javascript if present in cart  -->
+      </ul>
+    </div>
+    <!-- step 2 -address -->
+    <div class="container my-2">
+      <h3> Step 2 : Address</h3>
+      <form method= 'POST'  action= '/shop/checkout'>
+        {% csrf_token %}
+        
+        <div class="form-row">
+          <!-- <input type="hidden" name="order_id"  id= "order_id"> -->
+          <input type="hidden" name="items_json"  id= "items_json">
+          <input type="hidden" name="amount"  id= "amount">
+
+          <div class="form-group col-md-6">
+            <label for="inputName">Enter Your Name</label>
+            <input type="text" class="form-control" id="name" name= 'name'>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="inputEmail4">Email</label>
+            <input type="email" class="form-control" id="email" name= 'email'>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="inputAddress">Address</label>
+          <input type="text" class="form-control" id="address" name= 'address' placeholder="1234 Main St">
+        </div>
+        <div class="form-group">
+          <label for="inputAddress2">Address Line 2</label>
+
+          <input type="text" class="form-control" id="addressl2" name= 'addressl2' placeholder="Apartment, studio, or floor">
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="inputPhone">Phone Number</label>
+            <input type="text" class="form-control" id="phone" name= "phone">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="inputCity">City</label>
+            <input type="text" class="form-control" id="city" name= "city">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="inputState">State</label>
+            <input id="text" class="form-control" id="state" name='state'>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputZip">Zip</label>
+            <input type="text" class="form-control" id="zip_code" name= "zip_code">
+          </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" id= "order_checkout">Place Order</button>
+      </form>
+
+
+
+
+
+    </div>
+  </div>
+
+
+
+  {% endblock %}
+
+  {% block js %} 
+  <script>
+
+    // check for cart items in local storage
+  if (localStorage.getItem('cart') == null) {
+    var cart = {};
+  }
+  else {
+    cart = JSON.parse(localStorage.getItem('cart')) //  string to JS via JSON Parse
+    
+  }
+  i= 1
+  var totalvalue = 0
+  for (item in cart){
+    let qty = cart[item][0];
+    let name = cart[item][1];
+    let price = cart[item][2];
+    let str = `<li class="list-group-item d-flex  my-1 justify-content-between align-items-center">${i}. ${name}
+     <span class="badge badge-primary badge-pill py-2 px-4">Quantity : ${qty} Nos. | Rs. ${price}</span>
+        </li>` 
+    $('#items').append(str)
+    i= i+1
+    // total cart value
+    totalvalue = totalvalue + qty *price;
+  }
+  let newstr = `<li class="list-group-item d-flex  my-1 justify-content-between align-items-center">
+    <button class= "btn btn-primary ">Total Cart Value </button>
+     <span > 
+      <button class= "btn btn-success ">Rs. ${totalvalue}</button>
+    </span>
+    </li>`
+  $('#items').append(newstr)
+
+    //adding items in cart  Cart length
+  if (localStorage.getItem('cart') == null) {
+    var cart = {};
+  }
+  else {
+    cart = JSON.parse(localStorage.getItem('cart')) //  string to JS via JSON Parse
+    
+  }
+  document.getElementById("cart_len").innerText = `(${Object.keys(cart).length})`
+  $('#popcart').popover()
+
+
+  $('#items_json').val(JSON.stringify(cart));
+  // id checkout_complete is True
+  // checkout_complete = false
+  $('#order_checkout').click(function(){
+
+    alert("Thank for choosing us. Your order id - {{order1.order_id}}.Please See Order Tracker for tracking your items ")
+    // print(JSON)
+    localStorage.clear()
+    cart= {}
+    // redirect to Shop ie Homepage
+    // console.log("redirection")
+    window.location = "/"
+  })
+  // if every thing works out 
+  $('#amount').val(totalvalue)
+
+  </script>
+  {% endblock %}
